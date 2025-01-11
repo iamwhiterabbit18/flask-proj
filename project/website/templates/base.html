@@ -28,18 +28,23 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav">
+            {% if user.is_authenticated %}
             <li class="nav-item">
-              <a class="nav-link" href="/login">Login</a>
+              <a class="nav-link" href="{{ url_for('views.home') }}">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/signup">Sign Up</a>
+              <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/logout">Logout</a>
+              <a class="nav-link" href="{{ url_for('auth.sign_up') }}"
+                >Sign Up</a
+              >
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/">Home</a>
-            </li>
+            {% endif %}
           </ul>
         </div>
       </div>
@@ -82,7 +87,7 @@
 
     <script
       type="text/javascript"
-      src="{{ url_for('static', filename='index .js') }}"
+      src="{{ url_for('static', filename='index.js') }}"
     ></script>
   </body>
 </html>
