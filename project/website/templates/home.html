@@ -1,5 +1,5 @@
-{% extends "base.html" %} {% block title %} Home {% endblock %} {% block content
-%}
+{# {% extends "base.html" %} {% block title %} Home {% endblock %} {% block
+content %}
 <h1 class="text-center">Notes</h1>
 <ul class="list-group list-group-flush" id="notes">
   {% for note in user.notes %}
@@ -20,4 +20,91 @@
     <button type="submit" class="btn btn-primary">Add Note</button>
   </div>
 </form>
+{% endblock %} #} 
+
+
+{% extends "base.html" %} 
+{% block title %} Home {% endblock %}
+{% block content %} 
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#joinModal">
+      Join a Room!
+  </button>
+  <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#createModal">
+      Create a Room!
+  </button>
+
+  <div class="modal fade" id="joinModal" tabindex="-1" aria-labelledby="joinModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="joinModal">Join a Room!</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="" method="POST">
+            <input type="hidden" name="form_type" value="join_room">
+            <div class="form-group">
+              <label for="room_name" class="sr-only">Room Name</label>
+              <input id="room_name" name="room_name" class="form-control form-control-sm" type="text" placeholder="Enter room name">
+            </div>
+            <div class="form-group">
+              <label for="password" class="sr-only">Password</label>
+              <input id="room_pass" name="room_pass" class="form-control form-control-sm" type="password" placeholder="Enter room password">
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Join</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createModal">Create a Room!</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="" method="POST">
+            <input type="hidden" name="form_type" value="create_room">
+            <div class="form-group">
+              <label for="room_name" class="sr-only">Room Name</label>
+              <input id="room_name" name="room_name" class="form-control form-control-sm" type="text" placeholder="Enter room name">
+            </div>
+            <div class="form-group">
+              <label for="password" class="sr-only">Password</label>
+              <input id="room_pass" name="room_pass" class="form-control form-control-sm" type="password" placeholder="Enter room password">
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Save changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mt-4">
+        <h3>Your Rooms</h3>
+        {% if user_rooms %}
+            <div class="row">
+                {% for room in user_rooms %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ room.room_name }}</h5>
+                                <a href="{{ url_for('rooms.room_handler', room_id=room.id) }}" class="btn btn-primary">Enter Room</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>You haven't joined any rooms yet.</p>
+        {% endif %}
+    </div>
 {% endblock %}
