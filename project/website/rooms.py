@@ -28,17 +28,22 @@ def room_handler(room_id):
     if request.method == 'GET':
       # check if current user belongs to the room
       with Session(db.engine) as session:
-        room_participant = select_joined_query_function(session, current_user, current_user.id == RoomParticipant.user_id, RoomParticipant)
+        room_participant = select_query_function(
+          session=session, 
+          target=RoomParticipant, 
+          filter_condition=(RoomParticipant.room_id == room_id) & (RoomParticipant.user_id == current_user.id))
       
-      # query all messages
-      with Session(db.engine) as session:
-        messages = select_joined_query_all_function(session, Message, Message.room_id == room_id, Message)
+      # # query all messages
+      # with Session(db.engine) as session:
+      #   messages = select_joined_query_all_function(session, Message, Message.room_id == room_id, Message)
 
       if not room_participant:
-        print(f"You don't belong to the room. Try ask for access credentials.")
+        flash(f"Room {room_id} does not exist.", category='error')
+        return redirect(url_for('views.home'))
       
       # print(f"Room page{room_id}\nRoom: {room}\nRoom Participant: {current_user.first_name}")
-      return render_template('room.html', room=room, user=current_user, messages=messages)
+      # return render_template('room.html', room=room, user=current_user, messages=messages)
+      return render_template('room.html', room=room, user=current_user)
 
     # Render room-specific page
     return render_template('room.html', room=room)
