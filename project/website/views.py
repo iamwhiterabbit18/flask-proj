@@ -54,7 +54,7 @@ def home():
         matching_room = None
         for _room in all_rooms:
           try:
-            decrypted_code = room_crypto.decrypt_room_code(_room.room_code)
+            decrypted_code = crypto_manager.decrypt_room_code(_room.room_code)
             if decrypted_code == room_code:
                 matching_room = _room
                 break

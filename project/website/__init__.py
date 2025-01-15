@@ -4,12 +4,11 @@ from flask_socketio import join_room, leave_room, send, SocketIO
 from os import path, getenv
 from flask_login import LoginManager
 from dotenv import load_dotenv
-from .crypto import room_crypto
+from .crypto import crypto_manager
 
 db = SQLAlchemy()
 socketio = SocketIO()
 DB_NAME = "database.db"
-
 
 def create_app():
   app = Flask(__name__)
@@ -17,8 +16,8 @@ def create_app():
   app.config['SECRET_KEY'] = getenv('SECRET_KEY', 'fallback_key')
   app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
   db.init_app(app)
-  socketio.init_app(app)
-  room_crypto.init_app(app)
+  socketio.init_app(app, cors_allowed_origins='*', logger=True, engineio_logger=True, log_output=True)
+  crypto_manager.init_app(app)
 
   from .utils import generate_room_code
 

@@ -4,7 +4,7 @@ from base64 import b64encode, b64decode
 from flask import current_app
 import os
 
-class RoomCodeCrypto:
+class CryptoManager:
     def __init__(self, app=None):
         self.fernet = None
         if app is not None:
@@ -39,5 +39,22 @@ class RoomCodeCrypto:
             return decrypted_data.decode('utf-8')
         except Exception as e:
             raise ValueError(f"Failed to decrypt room code: {str(e)}")
+    
+    def encrypt_message(self, message: str) -> str:
+        """Encrypt a message"""
+        if not isinstance(message, str):
+            raise ValueError("Message must be a string")
+        
+        encrypted_data = self.fernet.encrypt(message.encode())
+        return b64encode(encrypted_data).decode('utf-8')
+    
+    def decrypt_message(self, encrypted_message: str) -> str:
+        """Decrypt an encrypted message"""
+        try:
+            encrypted_data = b64decode(encrypted_message.encode('utf-8'))
+            decrypted_data = self.fernet.decrypt(encrypted_data)
+            return decrypted_data.decode('utf-8')
+        except Exception as e:
+            raise ValueError(f"Failed to decrypt message: {str(e)}")
 
-room_crypto = RoomCodeCrypto()  # Create a single instance
+crypto_manager = CryptoManager()  # Create a single instance
