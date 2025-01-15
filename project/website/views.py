@@ -26,47 +26,54 @@ def home():
       # user_rooms = result.scalars().all()
       user_rooms = select_joined_query_all_function(session, Room, RoomParticipant.user_id == current_user.id, RoomParticipant)
 
+      # Decrypt room codes for display
+      rooms_with_codes = []
+      for room in user_rooms:
+          room_data = {
+              'id': room.id,
+              'room_name': room.room_name,
+              'plain_code': get_decrypted_room_code(room.room_code)
+          }
+          rooms_with_codes.append(room_data)
+
   if request.method == 'POST':
     data = request.form
     form_type = data.get('form_type')
+    room_code = data.get('room_code')
     room_name = data.get('room_name')
     room_pass = data.get('room_pass')
 
-    if not room_name or not room_pass:
-      flash('Both room name and password are required.', category='error')
-      return render_template('home.html', user=current_user)
-
-    #debugging
-    if not room_name:
-      print ('No room name')
-    else:
-      print (room_name)
-
-    if not room_pass:
-      print ('No password')
-    else:
-      print (room_pass)
-
-    with Session(db.engine) as session:
-        room = select_query_function(session, Room, Room.room_name == room_name)
-
     if form_type == 'join_room':
-      if not room or not check_password_hash(room.password, room_pass):
-        flash('Incorrect room name or password', category='error')
+      if not room_code or not room_pass:
+        flash('Both room code and password are required.', category='error')
+        return render_template('home.html', user=current_user)
+
+      # Get all rooms and check if any code matches the input
+      with Session(db.engine) as session:
+        all_rooms = session.query(Room).all()
+        matching_room = None
+        for _room in all_rooms:
+          try:
+            decrypted_code = room_crypto.decrypt_room_code(_room.room_code)
+            if decrypted_code == room_code:
+                matching_room = _room
+                break
+          except ValueError:
+              continue
+      
+      if not matching_room or not check_password_hash(matching_room.password, room_pass):
+        flash('Incorrect room code or password', category='error')
         return redirect(url_for('views.home'))
       
       with Session(db.engine) as session:
-        # stmt = select(RoomParticipant).where(RoomParticipant.room_id == room.id, RoomParticipant.user_id == current_user.id)
-        # result = session.execute(stmt)
-        # room_join = result.scalars().first()
         condition = and_(
-          RoomParticipant.room_id == room.id,
+          RoomParticipant.room_id == matching_room.id,
           RoomParticipant.user_id == current_user.id
           )
         room_join = select_query_function(session, RoomParticipant, condition)
 
       if not room_join:
-        new_room_participant = RoomParticipant(room_id=room.id, user_id=current_user.id)
+        new_room_participant = RoomParticipant(room_id=matching_room.id, user_id=current_user.id)
         db.session.add(new_room_participant)
         db.session.commit()
         flash('Joined room!', category='success')
@@ -76,10 +83,19 @@ def home():
       return redirect(url_for('views.home'))
 
     elif form_type == 'create_room':
+      if not room_name or not room_pass:
+        flash('Both room name and password are required.', category='error')
+        return render_template('home.html', user=current_user)
+
+      with Session(db.engine) as session:
+        room = select_query_function(session, Room, Room.room_name == room_name)
+
       if room:
-        flash('Room already exists', category='error')
+        flash('Room name already exists', category='error')
       else:
-        new_room = Room(room_name=room_name, password=generate_password_hash(room_pass, 'pbkdf2:sha256'))
+        new_room = Room(room_name=room_name, room_code=generate_room_code(), password=generate_password_hash(room_pass, 'pbkdf2:sha256'))
+        #debugg
+        print(f"New room code: {new_room.room_code}")
         db.session.add(new_room)
         db.session.commit()
 
@@ -95,7 +111,7 @@ def home():
     return redirect(url_for('views.home'))
     
   
-  return render_template('home.html', user=current_user, user_rooms=user_rooms)
+  return render_template('home.html', user=current_user, user_rooms=user_rooms, decryptor=get_decrypted_room_code)
 # @views.route('/', methods=['GET', 'POST'])
 # @login_required
 # def home():

@@ -4,11 +4,11 @@ from flask_socketio import join_room, leave_room, send, SocketIO
 from os import path, getenv
 from flask_login import LoginManager
 from dotenv import load_dotenv
+from .crypto import room_crypto
 
 db = SQLAlchemy()
 socketio = SocketIO()
 DB_NAME = "database.db"
-
 
 
 def create_app():
@@ -18,6 +18,9 @@ def create_app():
   app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
   db.init_app(app)
   socketio.init_app(app)
+  room_crypto.init_app(app)
+
+  from .utils import generate_room_code
 
   from .views import views
   from .auth import auth
