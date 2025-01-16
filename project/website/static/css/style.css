@@ -1,3 +1,10 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
 .message-box {
   border-color: black;
   border-width: 2px;
@@ -28,6 +35,20 @@ h2 {
 
 #message {
   flex: 1;
+}
+
+.message{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.message p {
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+}
+.message strong, .message p {
+  margin-right: 5px;
 }
 
 .text {

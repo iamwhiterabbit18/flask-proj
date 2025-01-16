@@ -20,3 +20,4 @@ class Message(db.Model):
   user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
   message = db.Column(db.Text, nullable=False)
   created_at = db.Column(db.DateTime(timezone=True), default=func.now())
+  sender = db.relationship('User', foreign_keys=[user_id], backref='sent_messages')

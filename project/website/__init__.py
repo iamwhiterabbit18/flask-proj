@@ -16,7 +16,7 @@ def create_app():
   app.config['SECRET_KEY'] = getenv('SECRET_KEY', 'fallback_key')
   app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
   db.init_app(app)
-  socketio.init_app(app, cors_allowed_origins='*', logger=True, engineio_logger=True, log_output=True)
+  socketio.init_app(app, cors_allowed_origins='*')
   crypto_manager.init_app(app)
 
   from .utils import generate_room_code
@@ -30,6 +30,9 @@ def create_app():
   app.register_blueprint(rooms, url_prefix='/')
 
   from .models import User, Note
+
+  from .sockets import init_socket_handlers
+  init_socket_handlers(socketio)
 
   create_database(app)
 
