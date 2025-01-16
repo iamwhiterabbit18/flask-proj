@@ -46,7 +46,7 @@ def home():
     if form_type == 'join_room':
       if not room_code or not room_pass:
         flash('Both room code and password are required.', category='error')
-        return render_template('home.html', user=current_user)
+        return redirect(url_for('views.home'))
 
       # Get all rooms and check if any code matches the input
       with Session(db.engine) as session:
@@ -85,25 +85,19 @@ def home():
     elif form_type == 'create_room':
       if not room_name or not room_pass:
         flash('Both room name and password are required.', category='error')
-        return render_template('home.html', user=current_user)
+        return redirect(url_for('views.home'))
 
-      with Session(db.engine) as session:
-        room = select_query_function(session, Room, Room.room_name == room_name)
+      new_room = Room(room_name=room_name, room_code=generate_room_code(), password=generate_password_hash(room_pass, 'pbkdf2:sha256'))
+      #debugg
+      print(f"New room code: {new_room.room_code}")
+      db.session.add(new_room)
+      db.session.commit()
 
-      if room:
-        flash('Room name already exists', category='error')
-      else:
-        new_room = Room(room_name=room_name, room_code=generate_room_code(), password=generate_password_hash(room_pass, 'pbkdf2:sha256'))
-        #debugg
-        print(f"New room code: {new_room.room_code}")
-        db.session.add(new_room)
-        db.session.commit()
+      new_room_participant = RoomParticipant(room_id=new_room.id, user_id=current_user.id)
+      db.session.add(new_room_participant)
+      db.session.commit()
 
-        new_room_participant = RoomParticipant(room_id=new_room.id, user_id=current_user.id)
-        db.session.add(new_room_participant)
-        db.session.commit()
-
-        flash('Room created!', category='success')
+      flash('Room created!', category='success')
       print(f'Creating room: {room_name} {room_pass}')
 
     else:

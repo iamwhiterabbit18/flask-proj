@@ -1,28 +1,32 @@
 {% extends "base.html" %}
-{% block title %} Room {% endblock%}
-{% block content %} 
-  <div class="container d-flex flex-column align-items-center justify-content-center mt-3">
+{% block title %}Room{% endblock %}
+{% block content %}
+<div class="container d-flex flex-column align-items-center justify-content-center mt-4">
   <div class="message-box">
-    <h4 class="text-center">Chat Room: {{room.room_name}}</h4>
-      <div class="messages" id="messages">
-        {% if messages %}
-            {% for msg in messages %}
-              <div class="message">
-                <strong>{{msg.sender.first_name}}:</strong>
-                <p>{{msg.decrypted_content}}</p>
-                <small id="created_at">{{msg.created_at}}</small>
-              </div>
-            {% endfor %}
-        {% endif %}
-      </div>
-  <div class="inputs">
-    <input type="text" rows="3" placeholder="Message" name="message" id="message">
-    <button type="button" name="send" id="send-btn" onClick="sendMessage()">
-      Send
-    </button>
-  </div>
+    <div class="p-3 border-bottom">
+      <h4 class="text-center mb-0">
+        <i class="bi bi-chat-dots me-2"></i>{{ room.room_name }}
+      </h4>
+    </div>
+    <div class="messages" id="messages">
+      {% if messages %}
+        {% for msg in messages %}
+          <div class="message">
+            <strong>{{ msg.sender.first_name }}</strong>
+            <p>{{ msg.decrypted_content }}</p>
+            <small id="created_at">{{ msg.created_at }}</small>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div class="inputs">
+      <input type="text" placeholder="Type your message..." name="message" id="message">
+      <button type="button" name="send" id="send-btn" onClick="sendMessage()">
+        <i class="bi bi-send me-1"></i>Send
+      </button>
     </div>
   </div>
+</div>
   <script type="text/javascript">
     var socketio = io();
 
