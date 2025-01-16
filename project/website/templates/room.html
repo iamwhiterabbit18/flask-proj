@@ -4,15 +4,17 @@
   <div class="container d-flex flex-column align-items-center justify-content-center mt-3">
   <div class="message-box">
     <h4 class="text-center">Chat Room: {{room.room_name}}</h4>
-      {# {% if messages %} #}
-        <div class="messages" id="messages">
-          {# {% for message in messages %} #}
-            <div class="col-md-4">
-              {# {{message.data}} #}
-            </div>
-          {# {% endfor %} #}
-        </div>
-      {# {% endif %} #}
+      <div class="messages" id="messages">
+        {% if messages %}
+            {% for msg in messages %}
+              <div class="message">
+                <strong>{{msg.sender.first_name}}:</strong>
+                <p>{{msg.decrypted_content}}</p>
+                <small id="created_at">{{msg.created_at}}</small>
+              </div>
+            {% endfor %}
+        {% endif %}
+      </div>
   <div class="inputs">
     <input type="text" rows="3" placeholder="Message" name="message" id="message">
     <button type="button" name="send" id="send-btn" onClick="sendMessage()">
@@ -34,18 +36,33 @@
         console.log('Received message:', data);
         // Add message to your messages div
         const messagesDiv = document.getElementById('messages');
+        let timestamp = data.created_at;
+        timestamp = timestamp.replace('T', ' ')
         messagesDiv.innerHTML += `
             <div class="message">
-                <strong>${data.user}</strong>: ${data.message}
-                <small>${data.timestamp}</small>
+                <strong>${data.user}:</strong>
+                 <p>${data.message}</p>
+                <small class="created_at">${timestamp}</small>
             </div>
         `;
+        messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll to bottom
     });
+
+    //<div class="join">
+    //  <em> → ${data.message}</em>
+    //</div>
 
     // When user joins/leaves
     socketio.on('status', (data) => {
-        console.log('Status update:', data);
-    });
+      console.log('Status update:', data);
+      const messagesDiv = document.getElementById('messages');
+        messagesDiv.innerHTML += `
+        <div class="join">
+          <em> → ${data.message}</em>
+        </div>
+      `;
+      messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll to bottom
+      });
 
 // Improved sendMessage function
 const sendMessage = () => {
