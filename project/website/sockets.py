@@ -3,7 +3,7 @@ from flask_login import current_user
 from . import socketio, db
 from sqlalchemy.orm import Session
 from website.Models.Room import Message
-
+from .crypto import crypto_manager
 
 def init_socket_handlers(socketio):
     @socketio.on('connect')
@@ -39,11 +39,15 @@ def init_socket_handlers(socketio):
             message = data.get('message')
             if room_id and message:
                 print(f"MESSAGE EVENT - Room: {room_id}, User: {current_user.first_name}, Message: {message}")
-                new_message = Message(room_id=room_id, user_id=current_user.id, message=message)
+                encrypt_message = crypto_manager.encrypt_message(message)
+                new_message = Message(room_id=room_id, user_id=current_user.id, message=encrypt_message)
                 db.session.add(new_message)
                 db.session.commit()
+
+                timestamp = new_message.created_at
                 emit('message', {
                     'room': room_id,
                     'user': current_user.first_name,
-                    'message': message
+                    'message': message,
+                    'created_at': timestamp.isoformat()
                 }, room=room_id)

@@ -41,6 +41,8 @@ h2 {
   display: flex;
   flex-direction: row;
   align-items: center;
+  margin: 10px 0 10px 0;
+
 }
 .message p {
   margin: 0;
@@ -49,6 +51,11 @@ h2 {
 }
 .message strong, .message p {
   margin-right: 5px;
+}
+.message small{
+  margin-top: 7px;
+  font-size: 10px;
+  color: darkgray;
 }
 
 .text {

@@ -45,11 +45,20 @@ def room_handler(room_id):
       )
       result = session.execute(stmt)
       messages = result.scalars().all()
+
+      #decrypt messages
+      decrypted_messages = []
       if messages:
-        # messages = [get_decrypted_message(msg) for msg in messages]
         for message in messages:
-          print(f"Message: {message.message}")
-          print(f"Sender: {message.sender}")
+          decrypted_message = {
+            'obj': message,  # Original message object with all attributes
+            'decrypted_content': get_decrypted_message(message),
+            'sender': message.sender,
+            'created_at': message.created_at
+          }
+          print(f"Message: {decrypted_message['decrypted_content']}")
+          print(f"Sender: {decrypted_message['sender'].first_name}")
+          decrypted_messages.append(decrypted_message)
       else:
         print("No messages found.")
     #   messages = select_joined_query_all_function(session, Message, Message.room_id == room_id, Message)
@@ -59,7 +68,7 @@ def room_handler(room_id):
       return redirect(url_for('views.home'))
     
     # print(f"Room page{room_id}\nRoom: {room}\nRoom Participant: {current_user.first_name}")
-    return render_template('room.html', room=room, user=current_user, messages=messages)
+    return render_template('room.html', room=room, user=current_user, messages=decrypted_messages)
 
   # Render room-specific page
   return render_template('room.html', room=room)

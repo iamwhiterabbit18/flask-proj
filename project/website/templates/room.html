@@ -9,7 +9,7 @@
             {% for msg in messages %}
               <div class="message">
                 <strong>{{msg.sender.first_name}}:</strong>
-                <p>{{msg.message}}</p>
+                <p>{{msg.decrypted_content}}</p>
                 <small id="created_at">{{msg.created_at}}</small>
               </div>
             {% endfor %}
@@ -36,11 +36,13 @@
         console.log('Received message:', data);
         // Add message to your messages div
         const messagesDiv = document.getElementById('messages');
+        let timestamp = data.created_at;
+        timestamp = timestamp.replace('T', ' ')
         messagesDiv.innerHTML += `
             <div class="message">
                 <strong>${data.user}:</strong>
                  <p>${data.message}</p>
-                <small>${data.created_at}</small>
+                <small class="created_at">${timestamp}</small>
             </div>
         `;
         messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll to bottom
