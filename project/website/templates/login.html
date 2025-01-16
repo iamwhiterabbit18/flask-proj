@@ -1,27 +1,32 @@
-{% extends "base.html" %} {% block title %} Login {% endblock %} {% block
-content %}
-<form action="" method="post">
-  <h3 class="text-center mb-4">Login</h3>
-  <div class="mb-3">
-    <label for="email">Email Address</label>
-    <input
-      type="email"
-      class="form-control"
-      id="email"
-      name="email"
-      placeholder="Enter email"
-    />
-  </div>
-  <div class="mb-3">
-    <label class="form-label" for="password1">Password</label>
-    <input
-      type="password"
-      class="form-control"
-      id="password"
-      name="password"
-      placeholder="Enter password"
-    />
-  </div>
-  <button type="submit" class="btn btn-primary">Login</button>
-</form>
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="auth-container">
+  <form action="" method="post">
+    <h3 class="text-center">Welcome Back!</h3>
+    <p class="text-center text-muted mb-4">Please login to continue</p>
+    
+    <div class="mb-4">
+      <label for="email" class="form-label">Email Address</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required />
+      </div>
+    </div>
+    
+    <div class="mb-4">
+      <label class="form-label" for="password">Password</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+        <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required />
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100 btn-custom">Login</button>
+    
+    <p class="text-center mt-4 mb-0">
+      Don't have an account? <a href="{{ url_for('auth.sign_up') }}" class="text-primary">Sign Up</a>
+    </p>
+  </form>
+</div>
 {% endblock %}
